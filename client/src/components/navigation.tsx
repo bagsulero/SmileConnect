@@ -80,7 +80,7 @@ export function Navigation({ currentUser, onRoleChange, onLogout }: NavigationPr
               <span className="text-sm text-gray-700">
                 {currentUser.firstName} {currentUser.lastName}
               </span>
-              {onLogout && currentUser.role === 'admin' && (
+              {onLogout && (
                 <Button variant="outline" size="sm" onClick={onLogout}>
                   Logout
                 </Button>

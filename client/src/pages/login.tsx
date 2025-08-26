@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (credentials: { username: string; password: string }) => string | null;
 }
 
 export default function Login({ onLogin }: LoginProps) {
@@ -21,14 +21,26 @@ export default function Login({ onLogin }: LoginProps) {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simple authentication check
-    if (username === "admin" && password === "admin") {
-      onLogin();
+    const userRole = onLogin({ username, password });
+    
+    if (userRole) {
       toast({
         title: "Success",
         description: "Logged in successfully!",
       });
-      setLocation("/admin");
+      
+      // Redirect to appropriate dashboard
+      switch (userRole) {
+        case 'admin':
+          setLocation("/admin");
+          break;
+        case 'student':
+          setLocation("/student");
+          break;
+        case 'barangay':
+          setLocation("/barangay");
+          break;
+      }
     } else {
       toast({
         title: "Error",
@@ -96,9 +108,12 @@ export default function Login({ onLogin }: LoginProps) {
             </form>
 
             <div className="mt-6 text-sm text-gray-500 text-center">
-              <p>Demo credentials:</p>
-              <p><strong>Username:</strong> admin</p>
-              <p><strong>Password:</strong> admin</p>
+              <p className="mb-2">Demo credentials:</p>
+              <div className="space-y-1">
+                <p><strong>Admin:</strong> admin / admin</p>
+                <p><strong>Student:</strong> student / student</p>
+                <p><strong>Health Worker:</strong> health / health</p>
+              </div>
             </div>
           </CardContent>
         </Card>

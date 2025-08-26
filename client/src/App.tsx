@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,13 +14,64 @@ import NotFound from "@/pages/not-found";
 import { UserRole } from "@/lib/types";
 
 function Router() {
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [, setLocation] = useLocation();
+  const [authenticatedUser, setAuthenticatedUser] = useState<{
+    id: number;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+  } | null>(null);
   const [currentUser, setCurrentUser] = useState({
     id: 1,
     firstName: "Maria",
     lastName: "Santos",
     role: "admin" as UserRole,
   });
+
+  const handleLogin = (credentials: { username: string; password: string }) => {
+    let user = null;
+    
+    if (credentials.username === "admin" && credentials.password === "admin") {
+      user = {
+        id: 1,
+        firstName: "Maria",
+        lastName: "Santos",
+        role: "admin" as UserRole,
+      };
+    } else if (credentials.username === "student" && credentials.password === "student") {
+      user = {
+        id: 2,
+        firstName: "Juan",
+        lastName: "Dela Cruz",
+        role: "student" as UserRole,
+      };
+    } else if (credentials.username === "health" && credentials.password === "health") {
+      user = {
+        id: 3,
+        firstName: "Maria",
+        lastName: "Santos",
+        role: "barangay" as UserRole,
+      };
+    }
+    
+    if (user) {
+      setAuthenticatedUser(user);
+      setCurrentUser(user);
+      return user.role;
+    }
+    return null;
+  };
+
+  const handleLogout = () => {
+    setAuthenticatedUser(null);
+    setCurrentUser({
+      id: 1,
+      firstName: "Maria",
+      lastName: "Santos",
+      role: "admin",
+    });
+    setLocation("/");
+  };
 
   const handleRoleChange = (role: UserRole) => {
     // In a real app, this would handle actual user switching or role changes
@@ -58,35 +109,53 @@ function Router() {
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/login" component={() => (
-          <Login onLogin={() => setIsAdminAuthenticated(true)} />
+          <Login onLogin={handleLogin} />
         )} />
         <Route path="/admin" component={() => {
-          if (!isAdminAuthenticated) {
-            return <Login onLogin={() => setIsAdminAuthenticated(true)} />;
+          if (!authenticatedUser || authenticatedUser.role !== 'admin') {
+            return <Login onLogin={handleLogin} />;
           }
           return (
             <div className="min-h-screen bg-gray-50">
               <Navigation 
                 currentUser={currentUser} 
                 onRoleChange={handleRoleChange}
-                onLogout={() => setIsAdminAuthenticated(false)}
+                onLogout={handleLogout}
               />
               <AdminDashboard />
             </div>
           );
         }} />
-        <Route path="/student" component={() => (
-          <div className="min-h-screen bg-gray-50">
-            <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
-            <StudentDashboard />
-          </div>
-        )} />
-        <Route path="/barangay" component={() => (
-          <div className="min-h-screen bg-gray-50">
-            <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
-            <BarangayDashboard />
-          </div>
-        )} />
+        <Route path="/student" component={() => {
+          if (!authenticatedUser || authenticatedUser.role !== 'student') {
+            return <Login onLogin={handleLogin} />;
+          }
+          return (
+            <div className="min-h-screen bg-gray-50">
+              <Navigation 
+                currentUser={currentUser} 
+                onRoleChange={handleRoleChange}
+                onLogout={handleLogout}
+              />
+              <StudentDashboard />
+            </div>
+          );
+        }} />
+        <Route path="/barangay" component={() => {
+          if (!authenticatedUser || authenticatedUser.role !== 'barangay') {
+            return <Login onLogin={handleLogin} />;
+          }
+          return (
+            <div className="min-h-screen bg-gray-50">
+              <Navigation 
+                currentUser={currentUser} 
+                onRoleChange={handleRoleChange}
+                onLogout={handleLogout}
+              />
+              <BarangayDashboard />
+            </div>
+          );
+        }} />
         <Route component={NotFound} />
       </Switch>
     </div>
