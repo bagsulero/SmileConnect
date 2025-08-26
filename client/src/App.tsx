@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
 import LandingPage from "@/pages/landing-page";
+import Login from "@/pages/login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import StudentDashboard from "@/pages/student-dashboard";
 import BarangayDashboard from "@/pages/barangay-dashboard";
@@ -13,6 +14,7 @@ import NotFound from "@/pages/not-found";
 import { UserRole } from "@/lib/types";
 
 function Router() {
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState({
     id: 1,
     firstName: "Maria",
@@ -55,12 +57,24 @@ function Router() {
     <div className="min-h-screen">
       <Switch>
         <Route path="/" component={LandingPage} />
-        <Route path="/admin" component={() => (
-          <div className="min-h-screen bg-gray-50">
-            <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
-            <AdminDashboard />
-          </div>
+        <Route path="/login" component={() => (
+          <Login onLogin={() => setIsAdminAuthenticated(true)} />
         )} />
+        <Route path="/admin" component={() => {
+          if (!isAdminAuthenticated) {
+            return <Login onLogin={() => setIsAdminAuthenticated(true)} />;
+          }
+          return (
+            <div className="min-h-screen bg-gray-50">
+              <Navigation 
+                currentUser={currentUser} 
+                onRoleChange={handleRoleChange}
+                onLogout={() => setIsAdminAuthenticated(false)}
+              />
+              <AdminDashboard />
+            </div>
+          );
+        }} />
         <Route path="/student" component={() => (
           <div className="min-h-screen bg-gray-50">
             <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />

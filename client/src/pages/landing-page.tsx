@@ -18,7 +18,7 @@ export default function LandingPage() {
             <Link href="/" className="text-gray-600 hover:text-gray-800 transition-colors">Home</Link>
             <Link href="/student" className="text-gray-600 hover:text-gray-800 transition-colors">Dentists</Link>
             <Link href="/barangay" className="text-gray-600 hover:text-gray-800 transition-colors">Patients</Link>
-            <Link href="/admin" className="text-gray-600 hover:text-gray-800 transition-colors">About Us</Link>
+            <Link href="/login" className="text-gray-600 hover:text-gray-800 transition-colors">Admin Login</Link>
           </div>
         </div>
       </nav>
@@ -63,7 +63,7 @@ export default function LandingPage() {
                 className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full text-lg font-medium"
                 asChild
               >
-                <Link href="/admin">Learn More</Link>
+                <Link href="/login">Learn More</Link>
               </Button>
             </div>
           </div>

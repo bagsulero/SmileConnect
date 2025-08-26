@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { UserRole } from "@/lib/types";
 
 interface NavigationProps {
@@ -12,9 +13,10 @@ interface NavigationProps {
     role: UserRole;
   };
   onRoleChange: (role: UserRole) => void;
+  onLogout?: () => void;
 }
 
-export function Navigation({ currentUser, onRoleChange }: NavigationProps) {
+export function Navigation({ currentUser, onRoleChange, onLogout }: NavigationProps) {
   const [location] = useLocation();
   
   const getDashboardPath = (role: UserRole) => {
@@ -78,6 +80,11 @@ export function Navigation({ currentUser, onRoleChange }: NavigationProps) {
               <span className="text-sm text-gray-700">
                 {currentUser.firstName} {currentUser.lastName}
               </span>
+              {onLogout && currentUser.role === 'admin' && (
+                <Button variant="outline" size="sm" onClick={onLogout}>
+                  Logout
+                </Button>
+              )}
             </div>
           </div>
         </div>
