@@ -1,0 +1,1003 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Case Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'medical-blue': '#1976D2',
+                        'medical-green': '#4CAF50',
+                        'medical-orange': '#FF9800',
+                        'medical-success': '#2E7D32',
+                        'medical-error': '#D32F2F',
+                        'medical-warning': '#F57C00'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-inter">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-tooth text-medical-blue text-2xl mr-3"></i>
+                    <span class="text-xl font-bold text-gray-800">DentalCare Manager</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <select id="roleSelector" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                        <option value="admin">Admin Dashboard</option>
+                        <option value="student">Student Dashboard</option>
+                        <option value="barangay">Barangay Health Worker</option>
+                    </select>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="User Avatar" class="w-8 h-8 rounded-full">
+                        <span class="text-sm text-gray-700" data-bind="user.name">Dr. Maria Santos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="dashboard-content">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+                <p class="text-gray-600">Manage users, review leads, and monitor system statistics</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-medical-blue bg-opacity-10 rounded-lg">
+                            <i class="fas fa-users text-medical-blue text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Active Students</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="stats.activeStudents">247</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-medical-green bg-opacity-10 rounded-lg">
+                            <i class="fas fa-clipboard-list text-medical-green text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Total Case Leads</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="stats.totalLeads">1,832</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-medical-orange bg-opacity-10 rounded-lg">
+                            <i class="fas fa-clock text-medical-orange text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Pending Reviews</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="stats.pendingReviews">24</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-medical-success bg-opacity-10 rounded-lg">
+                            <i class="fas fa-check-circle text-medical-success text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Completed Cases</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="stats.completedCases">156</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Tabs -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                        <button class="admin-tab-btn py-4 px-1 border-b-2 border-medical-blue text-medical-blue font-medium text-sm" data-tab="users">User Management</button>
+                        <button class="admin-tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm" data-tab="leads">Lead Review</button>
+                        <button class="admin-tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm" data-tab="analytics">Analytics</button>
+                    </nav>
+                </div>
+
+                <!-- User Management Tab -->
+                <div id="adminUsersTab" class="admin-tab-content p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
+                        <button class="bg-medical-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>Add User
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" data-mock="true">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="User">
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Juan Dela Cruz</div>
+                                                <div class="text-sm text-gray-500">juan.delacruz@email.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Student</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 hours ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-medical-blue hover:text-blue-700 mr-3">Edit</button>
+                                        <button class="text-red-600 hover:text-red-800">Deactivate</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img class="h-10 w-10 rounded-full" src="https://pixabay.com/get/g9773617714bfb46866bc28cc8c99b4377dbf613b3709d70b08edca55cc360154fb2a0decb87b798d6a9147a1ef1e356beb2528c3de473f6a2f2b57d846652ccd_1280.jpg" alt="User">
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Maria Santos</div>
+                                                <div class="text-sm text-gray-500">maria.santos@email.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Barangay Health Worker</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 day ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="text-medical-blue hover:text-blue-700 mr-3">Edit</button>
+                                        <button class="text-red-600 hover:text-red-800">Deactivate</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Lead Review Tab -->
+                <div id="adminLeadsTab" class="admin-tab-content p-6 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Lead Review & Management</h2>
+                        <div class="flex space-x-2">
+                            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                                <i class="fab fa-facebook mr-2"></i>Facebook Leads
+                            </button>
+                            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                                <i class="fab fa-reddit mr-2"></i>Reddit Leads
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-mock="true">
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <i class="fab fa-facebook text-blue-600 text-xl mr-3"></i>
+                                    <span class="font-medium text-gray-900">Facebook Lead</span>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending Review</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value="Ana Reyes" data-mock="true">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value="09123456789" data-mock="true">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" rows="3" data-mock="true">Severe toothache on upper left molar, pain for 3 days, difficulty eating</textarea>
+                                </div>
+                                <div class="flex space-x-2 mt-4">
+                                    <button class="bg-medical-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                                        <i class="fas fa-check mr-2"></i>Publish
+                                    </button>
+                                    <button class="bg-medical-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                        <i class="fas fa-edit mr-2"></i>Edit
+                                    </button>
+                                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                                        <i class="fas fa-trash mr-2"></i>Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <i class="fab fa-reddit text-orange-600 text-xl mr-3"></i>
+                                    <span class="font-medium text-gray-900">Reddit Lead</span>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending Review</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value="Carlos Mendoza" data-mock="true">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value="carlosmendoza@email.com" data-mock="true">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" rows="3" data-mock="true">Need tooth extraction, wisdom tooth impacted, referred by dentist</textarea>
+                                </div>
+                                <div class="flex space-x-2 mt-4">
+                                    <button class="bg-medical-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                                        <i class="fas fa-check mr-2"></i>Publish
+                                    </button>
+                                    <button class="bg-medical-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                        <i class="fas fa-edit mr-2"></i>Edit
+                                    </button>
+                                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                                        <i class="fas fa-trash mr-2"></i>Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="adminAnalyticsTab" class="admin-tab-content p-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">System Analytics</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Lead Sources</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-facebook text-blue-600 mr-3"></i>
+                                        <span class="text-sm font-medium text-gray-700">Facebook</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">65%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-reddit text-orange-600 mr-3"></i>
+                                        <span class="text-sm font-medium text-gray-700">Reddit</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                            <div class="bg-orange-600 h-2 rounded-full" style="width: 25%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">25%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-home text-purple-600 mr-3"></i>
+                                        <span class="text-sm font-medium text-gray-700">Barangay</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                            <div class="bg-purple-600 h-2 rounded-full" style="width: 10%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">10%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Case Status Distribution</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Available</span>
+                                    <div class="flex items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                            <div class="bg-gray-500 h-2 rounded-full" style="width: 45%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">45%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Claimed</span>
+                                    <div class="flex items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                            <div class="bg-medical-orange h-2 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">30%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Completed</span>
+                                    <div class="flex items-center">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                            <div class="bg-medical-success h-2 rounded-full" style="width: 25%"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">25%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="dashboard-content hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Student Dashboard</h1>
+                <p class="text-gray-600">Browse and manage dental case leads</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <i class="fas fa-clipboard-list text-medical-blue text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Available Cases</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="student.stats.available">42</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-lg">
+                            <i class="fas fa-bookmark text-medical-green text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Saved Cases</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="student.stats.saved">8</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-orange-100 rounded-lg">
+                            <i class="fas fa-user-check text-medical-orange text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Claimed Cases</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="student.stats.claimed">3</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-lg">
+                            <i class="fas fa-history text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Completed</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="student.stats.completed">12</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                        <button class="student-tab-btn py-4 px-1 border-b-2 border-medical-blue text-medical-blue font-medium text-sm" data-tab="cases">Case Leads</button>
+                        <button class="student-tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm" data-tab="saved">Saved Cases</button>
+                        <button class="student-tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm" data-tab="claimed">Claimed Cases</button>
+                        <button class="student-tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm" data-tab="history">Case History</button>
+                    </nav>
+                </div>
+
+                <!-- Case Leads Tab -->
+                <div id="studentCasesTab" class="student-tab-content p-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4 md:mb-0">Available Case Leads</h2>
+                        <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+                            <input type="text" placeholder="Search cases..." class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                            <select class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                                <option>All Sources</option>
+                                <option>Facebook</option>
+                                <option>Reddit</option>
+                                <option>Barangay</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" data-mock="true">
+                        <!-- Case Lead Card 1 -->
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer case-lead-card" data-case-id="1">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-facebook text-blue-600 mr-2"></i>
+                                        <span class="text-sm font-medium text-gray-600">Facebook</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">2 hours ago</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Ana Reyes</h3>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">Severe toothache on upper left molar, pain for 3 days, difficulty eating. Looking for urgent dental care.</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">Urgent</span>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Quezon City</span>
+                                    </div>
+                                    <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Case Lead Card 2 -->
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer case-lead-card" data-case-id="2">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-reddit text-orange-600 mr-2"></i>
+                                        <span class="text-sm font-medium text-gray-600">Reddit</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">5 hours ago</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Carlos Mendoza</h3>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">Need wisdom tooth extraction, impacted and causing pain. Referred by dentist for extraction.</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Moderate</span>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Makati</span>
+                                    </div>
+                                    <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Case Lead Card 3 -->
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer case-lead-card" data-case-id="3">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-home text-purple-600 mr-2"></i>
+                                        <span class="text-sm font-medium text-gray-600">Barangay</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">1 day ago</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Maria Santos</h3>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">Routine dental cleaning needed, last visit was 2 years ago. Some sensitivity issues.</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Routine</span>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Pasig</span>
+                                    </div>
+                                    <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saved Cases Tab -->
+                <div id="studentSavedTab" class="student-tab-content p-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Saved Case Leads</h2>
+                    <div class="space-y-4" data-mock="true">
+                        <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-bookmark text-medical-green mr-3"></i>
+                                <div>
+                                    <h3 class="font-medium text-gray-900">Ana Reyes</h3>
+                                    <p class="text-sm text-gray-600">Severe toothache - Facebook</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="bg-medical-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">Claim</button>
+                                <button class="text-gray-600 hover:text-gray-800 text-sm">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Claimed Cases Tab -->
+                <div id="studentClaimedTab" class="student-tab-content p-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Claimed Cases</h2>
+                    <div class="space-y-4" data-mock="true">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-medium text-gray-900">Ana Reyes</h3>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Contacted</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">Severe toothache - Facebook</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">Claimed 2 days ago</span>
+                                <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">View Progress</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case History Tab -->
+                <div id="studentHistoryTab" class="student-tab-content p-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Case History</h2>
+                    <div class="space-y-4" data-mock="true">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-medium text-gray-900">Pedro Garcia</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Completed</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">Dental cleaning - Barangay</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">Completed 1 week ago</span>
+                                <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barangay Health Worker Dashboard -->
+    <div id="barangayDashboard" class="dashboard-content hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Barangay Health Worker Dashboard</h1>
+                <p class="text-gray-600">Submit and track community dental cases</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <i class="fas fa-plus text-medical-blue text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Cases Submitted</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="barangay.stats.submitted">18</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-lg">
+                            <i class="fas fa-check text-medical-green text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Cases Completed</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="barangay.stats.completed">12</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-orange-100 rounded-lg">
+                            <i class="fas fa-clock text-medical-orange text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Pending Cases</h3>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="barangay.stats.pending">6</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Submit New Case Form -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Submit New Case</h2>
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue" placeholder="Enter patient name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contact Information</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue" placeholder="Phone or email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                            <input type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue" placeholder="Patient age">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue" rows="2" placeholder="Complete address"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dental Issue Description</label>
+                            <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue" rows="3" placeholder="Describe the dental problem"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Priority Level</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                                <option>Routine</option>
+                                <option>Moderate</option>
+                                <option>Urgent</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-medical-blue text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                            Submit Case
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Recent Cases -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Recent Cases</h2>
+                    <div class="space-y-4" data-mock="true">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Lola Carmen</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Completed</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Denture fitting - Age 67</p>
+                            <p class="text-xs text-gray-500">Submitted 2 weeks ago</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Jose Rizal</h3>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">In Progress</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Tooth extraction - Age 45</p>
+                            <p class="text-xs text-gray-500">Submitted 1 week ago</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Maria Clara</h3>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Available</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Dental cleaning - Age 28</p>
+                            <p class="text-xs text-gray-500">Submitted 3 days ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Detail Modal -->
+    <div id="caseDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Case Details</h2>
+                        <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-6" data-mock="true">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Patient Information</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                                        <p class="text-sm text-gray-900">Ana Reyes</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Age</label>
+                                        <p class="text-sm text-gray-900">34 years old</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Contact</label>
+                                        <p class="text-sm text-gray-900">09123456789</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Address</label>
+                                        <p class="text-sm text-gray-900">123 Main St, Quezon City</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Case Information</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Source</label>
+                                        <div class="flex items-center">
+                                            <i class="fab fa-facebook text-blue-600 mr-2"></i>
+                                            <span class="text-sm text-gray-900">Facebook</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Priority</label>
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">Urgent</span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Date Submitted</label>
+                                        <p class="text-sm text-gray-900">March 15, 2024</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Issue Description</h3>
+                            <p class="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg">
+                                Severe toothache on upper left molar, pain for 3 days, difficulty eating. Patient reports throbbing pain that worsens at night. No previous dental work on this tooth. Patient is looking for urgent dental care and is available for immediate treatment.
+                            </p>
+                        </div>
+                        
+                        <div class="flex space-x-4 pt-4">
+                            <button class="bg-medical-green text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-bookmark mr-2"></i>Save Case
+                            </button>
+                            <button class="bg-medical-blue text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-user-check mr-2"></i>Claim Case
+                            </button>
+                            <button class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claim Case Tracker Modal -->
+    <div id="claimTrackerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Claim Case Tracker</h2>
+                        <button id="closeClaimModal" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Claimed Cases List -->
+                        <div class="lg:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">My Claimed Cases</h3>
+                            <div class="space-y-4" data-mock="true">
+                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-yellow-400">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-gray-900">Ana Reyes</h4>
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Contacted</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Severe toothache - Urgent</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">Claimed 2 days ago</span>
+                                        <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">Update Status</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-400">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-gray-900">Carlos Mendoza</h4>
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Scheduled</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Wisdom tooth extraction</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">Appointment: March 20, 2024</span>
+                                        <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">Update Status</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-green-400">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-gray-900">Pedro Garcia</h4>
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Done</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Dental cleaning - Completed</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">Completed 1 week ago</span>
+                                        <button class="text-medical-blue hover:text-blue-700 text-sm font-medium">View Notes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Calendar and Notes -->
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Appointment Calendar</h3>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500 mb-2">
+                                        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1 text-center text-sm">
+                                        <div class="p-2 text-gray-400">28</div>
+                                        <div class="p-2 text-gray-400">29</div>
+                                        <div class="p-2 text-gray-400">1</div>
+                                        <div class="p-2">2</div>
+                                        <div class="p-2">3</div>
+                                        <div class="p-2">4</div>
+                                        <div class="p-2">5</div>
+                                        <div class="p-2">6</div>
+                                        <div class="p-2">7</div>
+                                        <div class="p-2">8</div>
+                                        <div class="p-2">9</div>
+                                        <div class="p-2">10</div>
+                                        <div class="p-2">11</div>
+                                        <div class="p-2">12</div>
+                                        <div class="p-2">13</div>
+                                        <div class="p-2">14</div>
+                                        <div class="p-2 bg-medical-blue text-white rounded">15</div>
+                                        <div class="p-2">16</div>
+                                        <div class="p-2">17</div>
+                                        <div class="p-2">18</div>
+                                        <div class="p-2">19</div>
+                                        <div class="p-2 bg-yellow-100 text-yellow-800 rounded">20</div>
+                                        <div class="p-2">21</div>
+                                        <div class="p-2">22</div>
+                                        <div class="p-2">23</div>
+                                        <div class="p-2">24</div>
+                                        <div class="p-2">25</div>
+                                        <div class="p-2">26</div>
+                                        <div class="p-2">27</div>
+                                        <div class="p-2">28</div>
+                                        <div class="p-2">29</div>
+                                        <div class="p-2">30</div>
+                                        <div class="p-2">31</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Patient Notes</h3>
+                                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-medical-blue" rows="4" placeholder="Add notes about patient interaction..."></textarea>
+                                <button class="mt-2 bg-medical-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                    Save Notes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard switching functionality
+        (function() {
+            const roleSelector = document.getElementById('roleSelector');
+            const dashboards = {
+                'admin': document.getElementById('adminDashboard'),
+                'student': document.getElementById('studentDashboard'),
+                'barangay': document.getElementById('barangayDashboard')
+            };
+
+            function showDashboard(role) {
+                Object.values(dashboards).forEach(dashboard => {
+                    dashboard.classList.add('hidden');
+                });
+                dashboards[role].classList.remove('hidden');
+            }
+
+            roleSelector.addEventListener('change', function() {
+                showDashboard(this.value);
+            });
+
+            // Admin tab functionality
+            const adminTabBtns = document.querySelectorAll('.admin-tab-btn');
+            const adminTabContents = document.querySelectorAll('.admin-tab-content');
+
+            adminTabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    
+                    // Reset all tab buttons
+                    adminTabBtns.forEach(b => {
+                        b.classList.remove('border-medical-blue', 'text-medical-blue');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // Activate clicked tab
+                    this.classList.add('border-medical-blue', 'text-medical-blue');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+                    
+                    // Show corresponding content
+                    adminTabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.remove('hidden');
+                });
+            });
+
+            // Student tab functionality
+            const studentTabBtns = document.querySelectorAll('.student-tab-btn');
+            const studentTabContents = document.querySelectorAll('.student-tab-content');
+
+            studentTabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    
+                    // Reset all tab buttons
+                    studentTabBtns.forEach(b => {
+                        b.classList.remove('border-medical-blue', 'text-medical-blue');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // Activate clicked tab
+                    this.classList.add('border-medical-blue', 'text-medical-blue');
+                    this.classList.remove('border-transparent', 'text-gray-500');
+                    
+                    // Show corresponding content
+                    studentTabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(`student${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.remove('hidden');
+                });
+            });
+
+            // Case detail modal functionality
+            const caseDetailModal = document.getElementById('caseDetailModal');
+            const closeModal = document.getElementById('closeModal');
+            const caseLeadCards = document.querySelectorAll('.case-lead-card');
+
+            caseLeadCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    caseDetailModal.classList.remove('hidden');
+                    // TODO: Load case details based on data-case-id
+                });
+            });
+
+            closeModal.addEventListener('click', function() {
+                caseDetailModal.classList.add('hidden');
+            });
+
+            // Claim tracker modal functionality
+            const claimTrackerModal = document.getElementById('claimTrackerModal');
+            const closeClaimModal = document.getElementById('closeClaimModal');
+
+            // Example trigger for claim tracker modal
+            document.addEventListener('click', function(e) {
+                if (e.target.textContent === 'View Progress') {
+                    claimTrackerModal.classList.remove('hidden');
+                }
+            });
+
+            closeClaimModal.addEventListener('click', function() {
+                claimTrackerModal.classList.add('hidden');
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === caseDetailModal) {
+                    caseDetailModal.classList.add('hidden');
+                }
+                if (e.target === claimTrackerModal) {
+                    claimTrackerModal.classList.add('hidden');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
