@@ -73,36 +73,6 @@ function Router() {
     setLocation("/");
   };
 
-  const handleRoleChange = (role: UserRole) => {
-    // In a real app, this would handle actual user switching or role changes
-    // For demo purposes, we'll just update the role and change the user data
-    switch (role) {
-      case 'admin':
-        setCurrentUser({
-          id: 1,
-          firstName: "Maria",
-          lastName: "Santos",
-          role: "admin",
-        });
-        break;
-      case 'student':
-        setCurrentUser({
-          id: 2,
-          firstName: "Juan",
-          lastName: "Dela Cruz",
-          role: "student",
-        });
-        break;
-      case 'barangay':
-        setCurrentUser({
-          id: 3,
-          firstName: "Maria",
-          lastName: "Santos",
-          role: "barangay",
-        });
-        break;
-    }
-  };
 
   return (
     <div className="min-h-screen">
@@ -119,7 +89,6 @@ function Router() {
             <div className="min-h-screen bg-gray-50">
               <Navigation 
                 currentUser={currentUser} 
-                onRoleChange={handleRoleChange}
                 onLogout={handleLogout}
               />
               <AdminDashboard />
@@ -134,7 +103,6 @@ function Router() {
             <div className="min-h-screen bg-gray-50">
               <Navigation 
                 currentUser={currentUser} 
-                onRoleChange={handleRoleChange}
                 onLogout={handleLogout}
               />
               <StudentDashboard />
@@ -149,7 +117,6 @@ function Router() {
             <div className="min-h-screen bg-gray-50">
               <Navigation 
                 currentUser={currentUser} 
-                onRoleChange={handleRoleChange}
                 onLogout={handleLogout}
               />
               <BarangayDashboard />

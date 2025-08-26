@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/lib/types";
@@ -12,38 +10,10 @@ interface NavigationProps {
     lastName: string;
     role: UserRole;
   };
-  onRoleChange: (role: UserRole) => void;
   onLogout?: () => void;
 }
 
-export function Navigation({ currentUser, onRoleChange, onLogout }: NavigationProps) {
-  const [location] = useLocation();
-  
-  const getDashboardPath = (role: UserRole) => {
-    switch (role) {
-      case 'admin':
-        return '/admin';
-      case 'student':
-        return '/student';
-      case 'barangay':
-        return '/barangay';
-      default:
-        return '/';
-    }
-  };
-
-  const getRoleName = (role: UserRole) => {
-    switch (role) {
-      case 'admin':
-        return 'Admin Dashboard';
-      case 'student':
-        return 'Student Dashboard';
-      case 'barangay':
-        return 'Barangay Health Worker';
-      default:
-        return 'Dashboard';
-    }
-  };
+export function Navigation({ currentUser, onLogout }: NavigationProps) {
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200">
@@ -59,17 +29,6 @@ export function Navigation({ currentUser, onRoleChange, onLogout }: NavigationPr
           </div>
           
           <div className="flex items-center space-x-4">
-            <Select value={currentUser.role} onValueChange={(value) => onRoleChange(value as UserRole)}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin Dashboard</SelectItem>
-                <SelectItem value="student">Student Dashboard</SelectItem>
-                <SelectItem value="barangay">Barangay Health Worker</SelectItem>
-              </SelectContent>
-            </Select>
-            
             <div className="flex items-center space-x-2">
               <Avatar className="w-8 h-8">
                 <AvatarImage src="/placeholder-avatar.jpg" alt="User Avatar" />
