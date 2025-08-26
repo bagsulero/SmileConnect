@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
+import LandingPage from "@/pages/landing-page";
 import AdminDashboard from "@/pages/admin-dashboard";
 import StudentDashboard from "@/pages/student-dashboard";
 import BarangayDashboard from "@/pages/barangay-dashboard";
@@ -51,25 +52,27 @@ function Router() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
+    <div className="min-h-screen">
       <Switch>
-        <Route path="/" component={() => {
-          // Redirect to appropriate dashboard based on role
-          switch (currentUser.role) {
-            case 'admin':
-              return <AdminDashboard />;
-            case 'student':
-              return <StudentDashboard />;
-            case 'barangay':
-              return <BarangayDashboard />;
-            default:
-              return <AdminDashboard />;
-          }
-        }} />
-        <Route path="/admin" component={AdminDashboard} />
-        <Route path="/student" component={StudentDashboard} />
-        <Route path="/barangay" component={BarangayDashboard} />
+        <Route path="/" component={LandingPage} />
+        <Route path="/admin" component={() => (
+          <div className="min-h-screen bg-gray-50">
+            <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
+            <AdminDashboard />
+          </div>
+        )} />
+        <Route path="/student" component={() => (
+          <div className="min-h-screen bg-gray-50">
+            <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
+            <StudentDashboard />
+          </div>
+        )} />
+        <Route path="/barangay" component={() => (
+          <div className="min-h-screen bg-gray-50">
+            <Navigation currentUser={currentUser} onRoleChange={handleRoleChange} />
+            <BarangayDashboard />
+          </div>
+        )} />
         <Route component={NotFound} />
       </Switch>
     </div>
