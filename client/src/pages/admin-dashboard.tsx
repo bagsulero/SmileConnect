@@ -12,11 +12,21 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardStats, CaseLeadWithDetails } from "@/lib/types";
 import { User } from "@shared/schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [editingLead, setEditingLead] = useState<CaseLeadWithDetails | null>(null);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newUser, setNewUser] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
+    password: "",
+    role: "student",
+  });
 
   const { data: stats } = useQuery<DashboardStats>({
     queryKey: ["/api/admin/stats"],
@@ -112,6 +122,28 @@ export default function AdminDashboard() {
     },
   });
 
+  const addUserMutation = useMutation({
+    mutationFn: async (user: typeof newUser) => {
+      await apiRequest("POST", "/api/users", user);
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "User added!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setShowAddUser(false);
+      setNewUser({
+        firstName: "",
+        lastName: "",
+        email: "",
+        username: "",
+        password: "",
+        role: "student",
+      });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add user", variant: "destructive" });
+    },
+  });
+
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
@@ -187,7 +219,10 @@ export default function AdminDashboard() {
           <TabsContent value="users" className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-900">User Management</h2>
-              <Button className="bg-medical-blue hover:bg-medical-blue/90">
+              <Button
+                className="bg-medical-blue hover:bg-medical-blue/90"
+                onClick={() => setShowAddUser(true)}
+              >
                 ➕ Add User
               </Button>
             </div>
@@ -497,6 +532,71 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </Card>
+
+      {/* Add User Modal */}
+      <Dialog open={showAddUser} onOpenChange={setShowAddUser}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+          </DialogHeader>
+          <form
+            className="space-y-3"
+            onSubmit={e => {
+              e.preventDefault();
+              addUserMutation.mutate(newUser);
+            }}
+          >
+            <Input
+              placeholder="First Name"
+              value={newUser.firstName}
+              onChange={e => setNewUser({ ...newUser, firstName: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Last Name"
+              value={newUser.lastName}
+              onChange={e => setNewUser({ ...newUser, lastName: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Email"
+              value={newUser.email}
+              onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Username"
+              value={newUser.username}
+              onChange={e => setNewUser({ ...newUser, username: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Password"
+              type="password"
+              value={newUser.password}
+              onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+              required
+            />
+            <select
+              className="w-full border rounded px-2 py-1"
+              value={newUser.role}
+              onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+            >
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+              <option value="barangay">Barangay</option>
+            </select>
+            <div className="flex justify-end space-x-2">
+              <Button type="submit" className="bg-medical-blue hover:bg-medical-blue/90">
+                Add
+              </Button>
+              <Button variant="outline" onClick={() => setShowAddUser(false)}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

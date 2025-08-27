@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { database } from "./database";
 import { insertCaseLeadSchema, insertUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -98,12 +99,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/admin/stats", async (req, res) => {
-    try {
-      const stats = await storage.getStats();
-      res.json(stats);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch stats" });
-    }
+    const stats = await storage.getStats();
+    res.json(stats);
   });
 
   // Saved cases routes
@@ -167,6 +164,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(400).json({ error: "Failed to update claimed case" });
     }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    const { username, password } = req.body;
+
+    // Demo users
+    if (username === "admin" && password === "admin") {
+      return res.json({ id: 1, firstName: "Maria", lastName: "Santos", role: "admin" });
+    }
+    if (username === "student" && password === "student") {
+      return res.json({ id: 2, firstName: "Juan", lastName: "Dela Cruz", role: "student" });
+    }
+    if (username === "health" && password === "health") {
+      return res.json({ id: 3, firstName: "Health", lastName: "Worker", role: "barangay" });
+    }
+
+    // Check storage for other users
+    const user = await storage.getUserByUsername(username);
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+    res.json({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    });
   });
 
   const httpServer = createServer(app);

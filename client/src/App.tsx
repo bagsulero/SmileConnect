@@ -21,55 +21,34 @@ function Router() {
     lastName: string;
     role: UserRole;
   } | null>(null);
-  const [currentUser, setCurrentUser] = useState({
-    id: 1,
-    firstName: "Maria",
-    lastName: "Santos",
-    role: "admin" as UserRole,
-  });
+  const [currentUser, setCurrentUser] = useState<{
+    id: number;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+  } | null>(null);
 
-  const handleLogin = (credentials: { username: string; password: string }) => {
-    let user = null;
-    
-    if (credentials.username === "admin" && credentials.password === "admin") {
-      user = {
-        id: 1,
-        firstName: "Maria",
-        lastName: "Santos",
-        role: "admin" as UserRole,
-      };
-    } else if (credentials.username === "student" && credentials.password === "student") {
-      user = {
-        id: 2,
-        firstName: "Juan",
-        lastName: "Dela Cruz",
-        role: "student" as UserRole,
-      };
-    } else if (credentials.username === "health" && credentials.password === "health") {
-      user = {
-        id: 3,
-        firstName: "Maria",
-        lastName: "Santos",
-        role: "barangay" as UserRole,
-      };
-    }
-    
-    if (user) {
+  // Updated handleLogin to fetch from backend
+  const handleLogin = async (credentials: { username: string; password: string }) => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
+      });
+      if (!res.ok) return null;
+      const user = await res.json();
       setAuthenticatedUser(user);
       setCurrentUser(user);
       return user.role;
+    } catch (err) {
+      return null;
     }
-    return null;
   };
 
   const handleLogout = () => {
     setAuthenticatedUser(null);
-    setCurrentUser({
-      id: 1,
-      firstName: "Maria",
-      lastName: "Santos",
-      role: "admin",
-    });
+    setCurrentUser(null);
     setLocation("/");
   };
 

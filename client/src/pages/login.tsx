@@ -7,28 +7,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 interface LoginProps {
-  onLogin: (credentials: { username: string; password: string }) => string | null;
+  onLogin: (credentials: { username: string; password: string }) => Promise<string | null>;
 }
 
 export default function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    const userRole = onLogin({ username, password });
-    
+    const userRole = await onLogin({ username, password });
+
     if (userRole) {
       toast({
         title: "Success",
         description: "Logged in successfully!",
       });
-      
+
       // Redirect to appropriate dashboard
       switch (userRole) {
         case 'admin':
@@ -40,15 +42,19 @@ export default function Login({ onLogin }: LoginProps) {
         case 'barangay':
           setLocation("/barangay");
           break;
+        default:
+          setLocation("/");
+          break;
       }
     } else {
+      setError("Invalid username or password");
       toast({
         title: "Error",
         description: "Invalid username or password",
         variant: "destructive",
       });
     }
-    
+
     setIsLoading(false);
   };
 
@@ -61,7 +67,7 @@ export default function Login({ onLogin }: LoginProps) {
             <svg className="w-10 h-10 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
-            <span className="text-2xl font-bold text-gray-800">DentalConnect</span>
+            <span className="text-2xl font-bold text-gray-800">SmileConnect</span>
           </div>
           <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
           <p className="text-gray-600 mt-2">Access the admin dashboard</p>
@@ -97,6 +103,8 @@ export default function Login({ onLogin }: LoginProps) {
                   required
                 />
               </div>
+
+              {error && <div className="text-red-500 text-center">{error}</div>}
 
               <Button 
                 type="submit" 
