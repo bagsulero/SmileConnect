@@ -61,7 +61,7 @@ export default function Login({ onLogin }: LoginProps) {
             <svg className="w-10 h-10 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
-            <span className="text-2xl font-bold text-gray-800">DentalConnect</span>
+            <span className="text-2xl font-bold text-gray-800">SmileConnect</span>
           </div>
           <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
           <p className="text-gray-600 mt-2">Access the admin dashboard</p>
