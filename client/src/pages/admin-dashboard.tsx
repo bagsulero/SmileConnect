@@ -40,6 +40,13 @@ export default function AdminDashboard() {
     queryKey: ["/api/admin/unpublished-leads"],
   });
 
+  const { data: completedCases = [] } = useQuery<CaseLeadWithDetails[]>({
+    queryKey: ["/api/case-leads", "completed"],
+    queryFn: async () => {
+      return await apiRequest("GET", "/api/case-leads?status=completed");
+    },
+  });
+
   const publishLeadMutation = useMutation({
     mutationFn: async (leadId: number) => {
       await apiRequest("PATCH", `/api/case-leads/${leadId}`, { isPublished: true });

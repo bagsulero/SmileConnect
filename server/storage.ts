@@ -1,19 +1,17 @@
-import { db } from "./mysql";
-import {
-  users,
-  caseLeads,
-  savedCases,
+import { 
+  users, 
+  caseLeads, 
+  savedCases, 
   claimedCases,
-  type User,
-  type InsertUser,
-  type CaseLead,
+  type User, 
+  type InsertUser, 
+  type CaseLead, 
   type InsertCaseLead,
   type SavedCase,
   type InsertSavedCase,
   type ClaimedCase,
   type InsertClaimedCase
 } from "@shared/schema";
-import express from "express";
 
 export interface IStorage {
   // User management
@@ -51,180 +49,316 @@ export interface IStorage {
   }>;
 }
 
-export class MySQLStorage implements IStorage {
+export class MemStorage implements IStorage {
+  private users: Map<number, User>;
+  private caseLeads: Map<number, CaseLead>;
+  private savedCases: Map<number, SavedCase>;
+  private claimedCases: Map<number, ClaimedCase>;
+  private currentUserId: number;
+  private currentCaseLeadId: number;
+  private currentSavedCaseId: number;
+  private currentClaimedCaseId: number;
+
+  constructor() {
+    this.users = new Map();
+    this.caseLeads = new Map();
+    this.savedCases = new Map();
+    this.claimedCases = new Map();
+    this.currentUserId = 1;
+    this.currentCaseLeadId = 1;
+    this.currentSavedCaseId = 1;
+    this.currentClaimedCaseId = 1;
+    
+    this.seedData();
+  }
+
+  private seedData() {
+    // Create sample users
+    const adminUser: User = {
+      id: this.currentUserId++,
+      username: "admin",
+      email: "admin@dentalcare.com",
+      password: "password",
+      role: "admin",
+      firstName: "Maria",
+      lastName: "Santos",
+      isActive: true,
+      lastActive: new Date(),
+      createdAt: new Date(),
+    };
+    
+    const studentUser: User = {
+      id: this.currentUserId++,
+      username: "student1",
+      email: "juan.delacruz@email.com",
+      password: "password",
+      role: "student",
+      firstName: "Juan",
+      lastName: "Dela Cruz",
+      isActive: true,
+      lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      createdAt: new Date(),
+    };
+    
+    const barangayUser: User = {
+      id: this.currentUserId++,
+      username: "barangay1",
+      email: "maria.santos@email.com",
+      password: "password",
+      role: "barangay",
+      firstName: "Maria",
+      lastName: "Santos",
+      isActive: true,
+      lastActive: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      createdAt: new Date(),
+    };
+    
+    this.users.set(adminUser.id, adminUser);
+    this.users.set(studentUser.id, studentUser);
+    this.users.set(barangayUser.id, barangayUser);
+    
+    // Create sample case leads
+    const caseLeads = [
+      {
+        id: this.currentCaseLeadId++,
+        patientName: "Ana Reyes",
+        age: 34,
+        contactInfo: "09123456789",
+        address: "123 Main St, Quezon City",
+        issueDescription: "Severe toothache on upper left molar, pain for 3 days, difficulty eating. Looking for urgent dental care.",
+        priority: "urgent",
+        source: "facebook",
+        location: "Quezon City",
+        status: "available",
+        submittedBy: null,
+        claimedBy: null,
+        isPublished: true,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      },
+      {
+        id: this.currentCaseLeadId++,
+        patientName: "Carlos Mendoza",
+        age: 28,
+        contactInfo: "carlosmendoza@email.com",
+        address: "456 Oak Ave, Makati",
+        issueDescription: "Need wisdom tooth extraction, impacted and causing pain. Referred by dentist for extraction.",
+        priority: "moderate",
+        source: "reddit",
+        location: "Makati",
+        status: "available",
+        submittedBy: null,
+        claimedBy: null,
+        isPublished: true,
+        createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+        updatedAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
+      },
+      {
+        id: this.currentCaseLeadId++,
+        patientName: "Maria Santos",
+        age: 45,
+        contactInfo: "09987654321",
+        address: "789 Pine St, Pasig",
+        issueDescription: "Routine dental cleaning needed, last visit was 2 years ago. Some sensitivity issues.",
+        priority: "routine",
+        source: "barangay",
+        location: "Pasig",
+        status: "available",
+        submittedBy: barangayUser.id,
+        claimedBy: null,
+        isPublished: true,
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      },
+      {
+        id: this.currentCaseLeadId++,
+        patientName: "Pedro Garcia",
+        age: 55,
+        contactInfo: "09111222333",
+        address: "321 Elm St, Mandaluyong",
+        issueDescription: "Dental cleaning completed successfully. Patient satisfied with treatment.",
+        priority: "routine",
+        source: "barangay",
+        location: "Mandaluyong",
+        status: "completed",
+        submittedBy: barangayUser.id,
+        claimedBy: studentUser.id,
+        isPublished: true,
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      },
+    ];
+    
+    caseLeads.forEach(caseLead => {
+      this.caseLeads.set(caseLead.id, caseLead as CaseLead);
+    });
+    
+    // Add a dummy completed case lead
+    const completedDummyCaseLead: CaseLead = {
+      id: this.currentCaseLeadId++,
+      patientName: "Read Account",
+      age: 29,
+      contactInfo: "read.account@email.com",
+      address: "456 Sample Ave, Demo City",
+      issueDescription: "Patient completed root canal treatment and restoration.",
+      priority: "routine",
+      source: "facebook",
+      location: "Demo City",
+      status: "completed",
+      submittedBy: 2, // student user id
+      claimedBy: 2,   // student user id
+      isPublished: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.caseLeads.set(completedDummyCaseLead.id, completedDummyCaseLead);
+
+    // Add a dummy completed claimed case for the same lead
+    const completedDummyClaimedCase: ClaimedCase = {
+      id: this.currentClaimedCaseId++,
+      userId: 2, // student user id
+      caseLeadId: completedDummyCaseLead.id,
+      status: "done",
+      appointmentDate: new Date().toISOString(),
+      notes: "Demo completed case for Read Account.",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.claimedCases.set(completedDummyClaimedCase.id, completedDummyClaimedCase);
+
+    
+  }
+
   async getUser(id: number): Promise<User | undefined> {
-    const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
-    return (rows as User[])[0];
+    return this.users.get(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [username]);
-    return (rows as User[])[0];
+    return Array.from(this.users.values()).find(user => user.username === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await db.query(
-      "INSERT INTO users (username, email, password, role, firstName, lastName, isActive, lastActive, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        insertUser.username,
-        insertUser.email,
-        insertUser.password,
-        insertUser.role,
-        insertUser.firstName,
-        insertUser.lastName,
-        true,
-        new Date(),
-        new Date(),
-      ]
-    );
-    const id = result[0].insertId;
-    return { id, ...insertUser, isActive: true, lastActive: new Date(), createdAt: new Date() };
+    const id = this.currentUserId++;
+    const user: User = {
+      ...insertUser,
+      id,
+      isActive: true,
+      lastActive: new Date(),
+      createdAt: new Date(),
+    };
+    this.users.set(id, user);
+    return user;
   }
 
   async updateUser(id: number, updateUser: Partial<User>): Promise<User> {
-    const user = await this.getUser(id);
+    const user = this.users.get(id);
     if (!user) {
       throw new Error(`User with id ${id} not found`);
     }
     const updatedUser = { ...user, ...updateUser };
-    await db.query(
-      "UPDATE users SET username = ?, email = ?, password = ?, role = ?, firstName = ?, lastName = ?, isActive = ?, lastActive = ?, createdAt = ? WHERE id = ?",
-      [
-        updatedUser.username,
-        updatedUser.email,
-        updatedUser.password,
-        updatedUser.role,
-        updatedUser.firstName,
-        updatedUser.lastName,
-        updatedUser.isActive,
-        updatedUser.lastActive,
-        updatedUser.createdAt,
-        id,
-      ]
-    );
+    this.users.set(id, updatedUser);
     return updatedUser;
   }
 
   async getAllUsers(): Promise<User[]> {
-    const [rows] = await db.query("SELECT * FROM users");
-    return rows as User[];
+    return Array.from(this.users.values());
   }
 
   async getCaseLead(id: number): Promise<CaseLead | undefined> {
-    const [rows] = await db.query("SELECT * FROM case_leads WHERE id = ?", [id]);
-    return (rows as CaseLead[])[0];
+    return this.caseLeads.get(id);
   }
 
   async getAllCaseLeads(): Promise<CaseLead[]> {
-    const [rows] = await db.query("SELECT * FROM case_leads");
-    return rows as CaseLead[];
+    return Array.from(this.caseLeads.values());
   }
 
   async getPublishedCaseLeads(): Promise<CaseLead[]> {
-    const [rows] = await db.query("SELECT * FROM case_leads WHERE isPublished = 1");
-    return rows as CaseLead[];
+    return Array.from(this.caseLeads.values()).filter(caseLead => caseLead.isPublished);
   }
 
   async getUnpublishedCaseLeads(): Promise<CaseLead[]> {
-    const [rows] = await db.query("SELECT * FROM caseLeads WHERE isPublished = 0");
-    return rows as CaseLead[];
+    return Array.from(this.caseLeads.values()).filter(caseLead => !caseLead.isPublished);
   }
 
   async createCaseLead(insertCaseLead: InsertCaseLead): Promise<CaseLead> {
-    const result = await db.query(
-      "INSERT INTO caseLeads (patientName, age, contactInfo, address, issueDescription, priority, source, location, status, submittedBy, claimedBy, isPublished, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        insertCaseLead.patientName,
-        insertCaseLead.age,
-        insertCaseLead.contactInfo,
-        insertCaseLead.address,
-        insertCaseLead.issueDescription,
-        insertCaseLead.priority,
-        insertCaseLead.source,
-        insertCaseLead.location,
-        'available',
-        null,
-        null,
-        0,
-        new Date(),
-        new Date(),
-      ]
-    );
-    const id = result[0].insertId;
-    return { id, ...insertCaseLead, status: 'available', claimedBy: null, isPublished: false, createdAt: new Date(), updatedAt: new Date() };
+    const id = this.currentCaseLeadId++;
+    const caseLead: CaseLead = {
+      ...insertCaseLead,
+      id,
+      status: 'available',
+      claimedBy: null,
+      isPublished: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.caseLeads.set(id, caseLead);
+    return caseLead;
   }
 
   async updateCaseLead(id: number, updateCaseLead: Partial<CaseLead>): Promise<CaseLead> {
-    const caseLead = await this.getCaseLead(id);
+    const caseLead = this.caseLeads.get(id);
     if (!caseLead) {
       throw new Error(`Case lead with id ${id} not found`);
     }
     const updatedCaseLead = { ...caseLead, ...updateCaseLead, updatedAt: new Date() };
-    await db.query(
-      "UPDATE caseLeads SET patientName = ?, age = ?, contactInfo = ?, address = ?, issueDescription = ?, priority = ?, source = ?, location = ?, status = ?, submittedBy = ?, claimedBy = ?, isPublished = ?, createdAt = ?, updatedAt = ? WHERE id = ?",
-      [
-        updatedCaseLead.patientName,
-        updatedCaseLead.age,
-        updatedCaseLead.contactInfo,
-        updatedCaseLead.address,
-        updatedCaseLead.issueDescription,
-        updatedCaseLead.priority,
-        updatedCaseLead.source,
-        updatedCaseLead.location,
-        updatedCaseLead.status,
-        updatedCaseLead.submittedBy,
-        updatedCaseLead.claimedBy,
-        updatedCaseLead.isPublished ? 1 : 0,
-        updatedCaseLead.createdAt,
-        updatedCaseLead.updatedAt,
-        id,
-      ]
-    );
+    this.caseLeads.set(id, updatedCaseLead);
     return updatedCaseLead;
   }
 
   async deleteCaseLead(id: number): Promise<void> {
-    await db.query("DELETE FROM caseLeads WHERE id = ?", [id]);
+    this.caseLeads.delete(id);
   }
 
   async getSavedCases(userId: number): Promise<(SavedCase & { caseLead: CaseLead })[]> {
-    const [rows] = await db.query(
-      "SELECT savedCases.*, caseLeads.* FROM savedCases JOIN caseLeads ON savedCases.caseLeadId = caseLeads.id WHERE savedCases.userId = ?",
-      [userId]
-    );
-    return rows as (SavedCase & { caseLead: CaseLead })[];
+    const savedCases = Array.from(this.savedCases.values()).filter(sc => sc.userId === userId);
+    return savedCases.map(sc => ({
+      ...sc,
+      caseLead: this.caseLeads.get(sc.caseLeadId)!
+    })).filter(sc => sc.caseLead);
   }
 
   async saveCaseLead(userId: number, caseLeadId: number): Promise<SavedCase> {
-    const result = await db.query(
-      "INSERT INTO savedCases (userId, caseLeadId, createdAt) VALUES (?, ?, ?)",
-      [userId, caseLeadId, new Date()]
-    );
-    const id = result[0].insertId;
-    return { id, userId, caseLeadId, createdAt: new Date() };
+    const id = this.currentSavedCaseId++;
+    const savedCase: SavedCase = {
+      id,
+      userId,
+      caseLeadId,
+      createdAt: new Date(),
+    };
+    this.savedCases.set(id, savedCase);
+    return savedCase;
   }
 
   async removeSavedCase(userId: number, caseLeadId: number): Promise<void> {
-    await db.query(
-      "DELETE FROM savedCases WHERE userId = ? AND caseLeadId = ?",
-      [userId, caseLeadId]
+    const savedCase = Array.from(this.savedCases.values()).find(
+      sc => sc.userId === userId && sc.caseLeadId === caseLeadId
     );
+    if (savedCase) {
+      this.savedCases.delete(savedCase.id);
+    }
   }
 
   async getClaimedCases(userId: number): Promise<(ClaimedCase & { caseLead: CaseLead })[]> {
-    const [rows] = await db.query(
-      "SELECT claimedCases.*, caseLeads.* FROM claimedCases JOIN caseLeads ON claimedCases.caseLeadId = caseLeads.id WHERE claimedCases.userId = ?",
-      [userId]
-    );
-    return rows as (ClaimedCase & { caseLead: CaseLead })[];
+    const claimedCases = Array.from(this.claimedCases.values()).filter(cc => cc.userId === userId);
+    return claimedCases.map(cc => ({
+      ...cc,
+      caseLead: this.caseLeads.get(cc.caseLeadId)!
+    })).filter(cc => cc.caseLead);
   }
 
   async claimCaseLead(userId: number, caseLeadId: number): Promise<ClaimedCase> {
-    const result = await db.query(
-      "INSERT INTO claimedCases (userId, caseLeadId, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
-      [userId, caseLeadId, 'contacted', new Date(), new Date()]
-    );
-    const id = result[0].insertId;
+    const id = this.currentClaimedCaseId++;
+    const claimedCase: ClaimedCase = {
+      id,
+      userId,
+      caseLeadId,
+      status: 'contacted',
+      appointmentDate: null,
+      notes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.claimedCases.set(id, claimedCase);
     
     // Update case lead status
     await this.updateCaseLead(caseLeadId, { 
@@ -232,70 +366,35 @@ export class MySQLStorage implements IStorage {
       claimedBy: userId 
     });
     
-    return { id, userId, caseLeadId, status: 'contacted', appointmentDate: null, notes: null, createdAt: new Date(), updatedAt: new Date() };
+    return claimedCase;
   }
 
   async updateClaimedCase(id: number, updateClaimedCase: Partial<ClaimedCase>): Promise<ClaimedCase> {
-    const claimedCase = await this.getClaimedCases(id);
+    const claimedCase = this.claimedCases.get(id);
     if (!claimedCase) {
       throw new Error(`Claimed case with id ${id} not found`);
     }
     const updatedClaimedCase = { ...claimedCase, ...updateClaimedCase, updatedAt: new Date() };
-    await db.query(
-      "UPDATE claimedCases SET userId = ?, caseLeadId = ?, status = ?, appointmentDate = ?, notes = ?, createdAt = ?, updatedAt = ? WHERE id = ?",
-      [
-        updatedClaimedCase.userId,
-        updatedClaimedCase.caseLeadId,
-        updatedClaimedCase.status,
-        updatedClaimedCase.appointmentDate,
-        updatedClaimedCase.notes,
-        updatedClaimedCase.createdAt,
-        updatedClaimedCase.updatedAt,
-        id,
-      ]
-    );
+    this.claimedCases.set(id, updatedClaimedCase);
     return updatedClaimedCase;
   }
 
-  async getStats() {
-    // Count active students
-    const [activeStudentsRows] = await db.query(
-      "SELECT COUNT(*) as count FROM users WHERE role = 'student' AND isActive = 1"
-    );
-    const activeStudents = (activeStudentsRows as any)[0].count;
-
-    // Count total leads
-    const [totalLeadsRows] = await db.query(
-      "SELECT COUNT(*) as count FROM case_leads"
-    );
-    const totalLeads = (totalLeadsRows as any)[0].count;
-
-    // Count pending reviews (example: unpublished leads)
-    const [pendingReviewsRows] = await db.query(
-      "SELECT COUNT(*) as count FROM case_leads WHERE isPublished = 0"
-    );
-    const pendingReviews = (pendingReviewsRows as any)[0].count;
-
-    // Count completed cases
-    const [completedCasesRows] = await db.query(
-      "SELECT COUNT(*) as count FROM case_leads WHERE status = 'completed'"
-    );
-    const completedCases = (completedCasesRows as any)[0].count;
-
+  async getStats(): Promise<{
+    activeStudents: number;
+    totalLeads: number;
+    pendingReviews: number;
+    completedCases: number;
+  }> {
+    const users = Array.from(this.users.values());
+    const caseLeads = Array.from(this.caseLeads.values());
+    
     return {
-      activeStudents,
-      totalLeads,
-      pendingReviews,
-      completedCases,
+      activeStudents: users.filter(u => u.role === 'student' && u.isActive).length,
+      totalLeads: caseLeads.length,
+      pendingReviews: caseLeads.filter(cl => !cl.isPublished).length,
+      completedCases: caseLeads.filter(cl => cl.status === 'completed').length,
     };
   }
 }
 
-export const storage = new MySQLStorage();
-
-const app = express();
-
-app.get("/api/admin/stats", async (req, res) => {
-  const stats = await storage.getStats();
-  res.json(stats);
-});
+export const storage = new MemStorage();
