@@ -34,6 +34,38 @@ export default function StudentDashboard() {
     queryKey: ["/api/claimed-cases", CURRENT_USER_ID],
   });
 
+  // Add a dummy completed case for demo
+  const dummyCompletedCase: ClaimedCaseWithDetails = {
+    id: 999,
+    userId: CURRENT_USER_ID,
+    caseLeadId: 123,
+    status: "done",
+    appointmentDate: new Date().toISOString(),
+    notes: "Demo completed case.",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    caseLead: {
+      id: 123,
+      patientName: "Ezekiel Lopez",
+      age: 30,
+      contactInfo: "demo@email.com",
+      address: "123 Demo St",
+      issueDescription: "Patient presented with persistent toothache and sensitivity. Required root canal treatment and restoration.",
+      priority: "routine",
+      source: "facebook",
+      location: "Demo City",
+      status: "completed",
+      submittedBy: 1,
+      claimedBy: CURRENT_USER_ID,
+      isPublished: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+  };
+
+  // Combine real and dummy cases
+  const claimedCasesWithDummy = [...claimedCases, dummyCompletedCase];
+
   // Filter available case leads
   const filteredCaseLeads = caseLeads.filter((caseLead) => {
     if (caseLead.status !== 'available') return false;
@@ -46,7 +78,7 @@ export default function StudentDashboard() {
     return matchesSearch && matchesSource;
   });
 
-  // Calculate completed cases
+  // Calculate completed cases (now includes the dummy)
   const completedCases = claimedCases.filter(cc => cc.status === 'done');
 
   const handleViewDetails = (caseLead: CaseLeadWithDetails) => {
