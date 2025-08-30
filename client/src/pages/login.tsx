@@ -67,14 +67,13 @@ export default function Login({ onLogin }: LoginProps) {
             <img src="/src/img/image 2.png" alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
             <span className="text-2xl font-bold text-gray-800">SmileConnect</span>
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
-          <p className="text-gray-600 mt-2">Access the admin dashboard</p>
         </div>
 
         {/* Login Form */}
         <Card className="shadow-lg">
-          <CardHeader>
+          <CardHeader className="flex justify-center items-center">
             <CardTitle className="text-center">Sign In</CardTitle>
+            <p className="text-sm font-thin">Enter your credentials to continue</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -89,7 +88,7 @@ export default function Login({ onLogin }: LoginProps) {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -104,32 +103,20 @@ export default function Login({ onLogin }: LoginProps) {
 
               {error && <div className="text-red-500 text-center">{error}</div>}
 
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700" 
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
 
-            <div className="mt-6 text-sm text-gray-500 text-center">
-              <p className="mb-2">Demo credentials:</p>
-              <div className="space-y-1">
-                <p><strong>Admin:</strong> admin / admin</p>
-                <p><strong>Student:</strong> student / student</p>
-                <p><strong>Health Worker:</strong> health / health</p>
-              </div>
+            <div className="underline text-blue-600 text-sm flex justify-center mt-5">
+              <p>Register</p>
             </div>
           </CardContent>
         </Card>
-
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Button variant="ghost" onClick={() => setLocation("/")} className="text-blue-600">
-            ← Back to Home
-          </Button>
-        </div>
       </div>
     </div>
   );
