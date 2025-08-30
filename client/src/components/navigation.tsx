@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/lib/types";
-import { AppLogo } from "../assets/app-logo.png";
+import AppLogo from "../assets/app-logo.png";
 
 interface NavigationProps {
   currentUser: {

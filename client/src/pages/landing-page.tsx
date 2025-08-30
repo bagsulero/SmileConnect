@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import SamImg from "../assets/sam.jpg";
 import JunImg from "../assets/jun.png";
 import CristineImg from "../assets/christine.png";
@@ -35,10 +36,17 @@ const teamMembers = [
 ];
 
 export default function LandingPage() {
+  const benefitsRef = useRef(null);
+  const aboutUsRef = useRef(null);
+
+  const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-white">
       {/* Navigation */}
-      <nav className="bg-transparent py-4 px-6">
+      <nav className="bg-transparent py-4 px-6 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <img src={AppLogo} alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
@@ -46,10 +54,27 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-gray-800 transition-colors">Home</Link>
-            <Link href="/student" className="text-gray-600 hover:text-gray-800 transition-colors">Dentists</Link>
-            <Link href="/barangay" className="text-gray-600 hover:text-gray-800 transition-colors">Patients</Link>
-            <Link href="/login" className="text-gray-600 hover:text-gray-800 transition-colors">Admin Login</Link>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-base text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => scrollToSection(benefitsRef)}
+              className="text-base text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+            >
+              Benefits
+            </button>
+            <button
+              onClick={() => scrollToSection(aboutUsRef)}
+              className="text-base text-blue-600 font-semibold hover:text-blue-800 transition-colors"
+            >
+              About Us
+            </button>
+            <Button className="text-base text-white bg-blue-600 px-3 py-1 font-semibold rounded-full hover:bg-blue-700 transition-colors">
+              <Link href="/student">Dashboard</Link>
+            </Button>
           </div>
         </div>
       </nav>
@@ -83,7 +108,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="bg-slate-700 hover:bg-slate-800 text-white px-8 py-3 rounded-full text-lg font-medium"
+                className="bg-slate-700 hover:bg-slate-800 text-white px-8 py-3 rounded-full text-lg font-medium transition-colors"
                 asChild
               >
                 <Link href="/student">Join Us</Link>
@@ -91,7 +116,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full text-lg font-medium"
+                className="border-2 border-blue-500 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full text-lg font-medium transition-colors"
                 asChild
               >
                 <Link href="/login">Learn More</Link>
@@ -152,7 +177,7 @@ export default function LandingPage() {
                       </div>
 
                       {/* Confirm Button */}
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 mt-6">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 mt-6 transition-colors">
                         Confirm
                       </Button>
                     </div>
@@ -166,7 +191,8 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className=" py-16 px-6 md:px-20">
+        {/* Benefits Section with ref */}
+        <div ref={benefitsRef} className="py-16 px-6 md:px-20 scroll-mt-16">
           {/* Heading */}
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
@@ -235,7 +261,8 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="min-h-screen flex items-center justify-center p-6">
+        {/* About Us Section with ref */}
+        <div ref={aboutUsRef} className="min-h-screen flex items-center justify-center p-6 scroll-mt-16">
           <div className="bg-sky-100 rounded-2xl shadow-lg max-w-6xl w-full p-10 text-center">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">About Us</h2>
             <p className="text-gray-700 max-w-2xl mx-auto mb-10">
