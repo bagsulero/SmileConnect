@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/lib/types";
+import { AppLogo } from "../assets/app-logo.png";
 
 interface NavigationProps {
   currentUser: {
@@ -21,11 +22,11 @@ export function Navigation({ currentUser, onLogout }: NavigationProps) {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <img src="/src/img/image 2.png" alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
+              <img src={AppLogo} alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
               <span className="text-xl font-bold text-gray-800">SmileConnect</span>
             </Link>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Avatar className="w-8 h-8">

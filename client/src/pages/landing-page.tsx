@@ -2,6 +2,7 @@ import SamImg from "../assets/sam.jpg";
 import JunImg from "../assets/jun.png";
 import CristineImg from "../assets/christine.png";
 import SimoneImg from "../assets/simon.jpg";
+import AppLogo from "../assets/app-logo.png";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -40,7 +41,7 @@ export default function LandingPage() {
       <nav className="bg-transparent py-4 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/src/img/image 2.png" alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
+            <img src={AppLogo} alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
             <span className="text-xl font-bold text-gray-800">SmileConnect</span>
           </div>
 

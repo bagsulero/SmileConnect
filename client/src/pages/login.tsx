@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import AppLogo from "../assets/app-logo.png";
 
 interface LoginProps {
   onLogin: (credentials: { username: string; password: string }) => Promise<string | null>;
@@ -64,7 +65,7 @@ export default function Login({ onLogin }: LoginProps) {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img src="/src/img/image 2.png" alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
+            <img src={AppLogo} alt="SmileConnect Logo" className="w-8 h-8 mr-3" />
             <span className="text-2xl font-bold text-gray-800">SmileConnect</span>
           </div>
         </div>
