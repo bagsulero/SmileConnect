@@ -28,6 +28,16 @@ export default function AdminDashboard() {
     role: "student",
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const leads = [
+    { name: "John Doe", contact: "john@example.com", priority: "Urgent", location: "New York" },
+    { name: "Jane Smith", contact: "555-123-4567", priority: "Routine", location: "Los Angeles" },
+    { name: "Michael Brown", contact: "michael@example.com", priority: "Emergency", location: "Chicago" },
+    { name: "Emily Johnson", contact: "222-987-6543", priority: "Routine", location: "Houston" },
+    { name: "David Wilson", contact: "david@example.com", priority: "Urgent", location: "San Francisco" },
+  ];
+
   const { data: stats } = useQuery<DashboardStats>({
     queryKey: ["/api/admin/stats"],
   });
@@ -218,7 +228,7 @@ export default function AdminDashboard() {
           <CardHeader>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="users">User Management</TabsTrigger>
-              <TabsTrigger value="leads">Lead Review</TabsTrigger>
+              <TabsTrigger value="leads">Lead Managment</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
           </CardHeader>
@@ -315,147 +325,141 @@ export default function AdminDashboard() {
 
           <TabsContent value="leads" className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Lead Review & Management</h2>
-              <div className="flex space-x-2">
-                <Button variant="outline">📘 Facebook Leads</Button>
-                <Button variant="outline">🔴 Reddit Leads</Button>
-              </div>
+              <h2 className="text-xl font-semibold text-gray-900">Lead Management</h2>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg shadow"
+              >
+                Add Lead
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {unpublishedLeads.length === 0 ? (
-                <div className="col-span-2 text-center py-8">
-                  <p className="text-gray-500">No pending leads for review.</p>
-                </div>
-              ) : (
-                unpublishedLeads.map((lead) => (
-                  <Card key={lead.id} className="bg-gray-50">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                          <span className="mr-3 text-xl">{getSourceIcon(lead.source)}</span>
-                          <span className="font-medium text-gray-900 capitalize">{lead.source} Lead</span>
-                        </div>
-                        <Badge className="bg-yellow-100 text-yellow-800">Pending Review</Badge>
-                      </div>
-                      
-                      {editingLead?.id === lead.id ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Patient Name
-                            </label>
-                            <Input
-                              value={editingLead.patientName}
-                              onChange={(e) =>
-                                setEditingLead({ ...editingLead, patientName: e.target.value })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Contact
-                            </label>
-                            <Input
-                              value={editingLead.contactInfo}
-                              onChange={(e) =>
-                                setEditingLead({ ...editingLead, contactInfo: e.target.value })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Issue Description
-                            </label>
-                            <Textarea
-                              value={editingLead.issueDescription}
-                              onChange={(e) =>
-                                setEditingLead({ ...editingLead, issueDescription: e.target.value })
-                              }
-                              rows={3}
-                            />
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              className="bg-medical-blue hover:bg-medical-blue/90"
-                              onClick={() =>
-                                updateLeadMutation.mutate({
-                                  id: editingLead.id,
-                                  updates: {
-                                    patientName: editingLead.patientName,
-                                    contactInfo: editingLead.contactInfo,
-                                    issueDescription: editingLead.issueDescription,
-                                  },
-                                })
-                              }
-                            >
-                              💾 Save
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditingLead(null)}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Patient Name
-                            </label>
-                            <p className="text-sm text-gray-900">{lead.patientName}</p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Contact
-                            </label>
-                            <p className="text-sm text-gray-900">{lead.contactInfo}</p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Issue Description
-                            </label>
-                            <p className="text-sm text-gray-900">{lead.issueDescription}</p>
-                          </div>
-                          <div className="flex space-x-2 mt-4">
-                            <Button
-                              size="sm"
-                              className="bg-medical-green hover:bg-medical-green/90"
-                              onClick={() => publishLeadMutation.mutate(lead.id)}
-                            >
-                              ✅ Publish
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="bg-medical-blue hover:bg-medical-blue/90"
-                              onClick={() => setEditingLead(lead)}
-                            >
-                              ✏️ Edit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteLeadMutation.mutate(lead.id)}
-                            >
-                              🗑️ Reject
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))
-              )}
+            {/* Table */}
+            <div className="overflow-x-auto shadow rounded-lg">
+              <table className="min-w-full border border-gray-200">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Contact</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Priority</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Location</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {leads.map((lead, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm text-gray-700">{lead.name}</td>
+                      <td className="px-4 py-2 text-sm text-gray-700">{lead.contact}</td>
+                      <td
+                        className={`px-4 py-2 text-sm font-semibold ${lead.priority === "Urgent"
+                          ? "text-red-600"
+                          : lead.priority === "Emergency"
+                            ? "text-orange-600"
+                            : "text-green-600"
+                          }`}
+                      >
+                        {lead.priority}
+                      </td>
+                      <td className="px-4 py-2 text-sm text-gray-700">{lead.location}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+
+            {/* Modal */}
+            {isModalOpen && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+                <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-6 relative">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                  >
+                    ✕
+                  </button>
+                  <h3 className="text-lg font-semibold mb-4">Add New Lead</h3>
+
+                  <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
+                      <input
+                        type="text"
+                        placeholder="Patient full name"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div className="md:row-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Dental Issue Description</label>
+                      <textarea
+                        rows={5}
+                        placeholder="Describe the dental case"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400"
+                      ></textarea>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Contact Information</label>
+                      <input
+                        type="text"
+                        placeholder="Phone or email"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Priority Level</label>
+                      <select className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400">
+                        <option>Routine</option>
+                        <option>Urgent</option>
+                        <option>Emergency</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                      <input
+                        type="number"
+                        placeholder="Patient age"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                      <input
+                        type="text"
+                        placeholder="City or area"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Link Source (URL)</label>
+                      <input
+                        type="url"
+                        placeholder="Link"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <button
+                        type="submit"
+                        className="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition"
+                      >
+                        Submit Lead
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="analytics" className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">System Analytics</h2>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
