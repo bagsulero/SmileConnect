@@ -7,28 +7,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 interface LoginProps {
-  onLogin: (credentials: { username: string; password: string }) => string | null;
+  onLogin: (credentials: { username: string; password: string }) => Promise<string | null>;
 }
 
 export default function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    const userRole = onLogin({ username, password });
-    
+    const userRole = await onLogin({ username, password });
+
     if (userRole) {
       toast({
         title: "Success",
         description: "Logged in successfully!",
       });
-      
+
       // Redirect to appropriate dashboard
       switch (userRole) {
         case 'admin':
@@ -40,15 +42,19 @@ export default function Login({ onLogin }: LoginProps) {
         case 'barangay':
           setLocation("/barangay");
           break;
+        default:
+          setLocation("/");
+          break;
       }
     } else {
+      setError("Invalid username or password");
       toast({
         title: "Error",
         description: "Invalid username or password",
         variant: "destructive",
       });
     }
-    
+
     setIsLoading(false);
   };
 
@@ -97,6 +103,8 @@ export default function Login({ onLogin }: LoginProps) {
                   required
                 />
               </div>
+
+              {error && <div className="text-red-500 text-center">{error}</div>}
 
               <Button 
                 type="submit" 
